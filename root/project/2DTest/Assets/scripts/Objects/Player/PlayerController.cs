@@ -82,14 +82,11 @@ public class PlayerController : MonoBehaviour
 	//--------------------------------------------
 	void Update ()
 	{
-		// 歩きアニメーションを行う条件を満たしているのかどうか
-		//bool isWalk = Input.GetAxisRaw("Horizontal")!=0.0f;
-
 		//myAnimator.SetBool("isWalk",isWalk);
 		if (!m_Jump)
 		{
 			// Read the jump input in Update so button presses aren't missed.
-			m_Jump = Input.GetButtonDown("Jump");
+			m_Jump = Input.GetButtonDown("Jump")||IsJumpTouch();
 		}
 	}
 
@@ -120,7 +117,11 @@ public class PlayerController : MonoBehaviour
 		myAnimator.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
 		bool crouch = Input.GetKey(KeyCode.LeftControl);
+
 		float h = Input.GetAxis("Horizontal");
+
+		h+=CalcMoveTouch();
+
 		// Pass all parameters to the character control script.
 		Move(h, crouch, m_Jump);
 		m_Jump = false;
@@ -196,5 +197,59 @@ public class PlayerController : MonoBehaviour
 		Vector3 theScale = transform.localScale;
 		theScale.x *= -1;
 		transform.localScale = theScale;
+	}
+
+	//--------------------------------------------
+	/// <summary>
+	/// ジャンプの入力確認(タッチ)処理
+	/// </summary>
+	//--------------------------------------------
+	private bool IsJumpTouch()
+	{
+		Vector2 ActiveTouchPosition;
+		bool jump=false;
+
+		if(InputTouch.Instance.isTouch())
+		{
+			for(int i=0;i<InputTouch.Instance.TouchCnt();i++)
+			{
+				//トリガーキーのみに反応するようにする
+				if(InputTouch.Instance.TouchPhase_(i)!=TouchPhase.Began){continue;}
+				ActiveTouchPosition=InputTouch.Instance.Position(i);
+				jump=ActiveTouchPosition.y>Screen.height/2.0f;
+				if(jump){break;}
+			}
+		}
+
+		return jump;
+	}
+
+	//--------------------------------------------
+	/// <summary>
+	/// 移動の入力確認(タッチ)処理
+	/// </summary>
+	//--------------------------------------------
+	private float CalcMoveTouch()
+	{
+		float h=0;
+		if(InputTouch.Instance.isTouch())
+		{
+			Vector2 ActiveTouchPosition=InputTouch.Instance.Position(InputTouch.Instance.CurrentActiveID_());
+
+			if(ActiveTouchPosition.y<Screen.height/2.0f)
+			{
+				if(ActiveTouchPosition.x<Screen.width/2.0f)
+				{
+					h=-1;
+				}
+
+				else
+				{
+					h=1;
+				}	
+			}
+		}
+
+		return h;
 	}
 }

@@ -10,6 +10,7 @@ public class Title_Manager : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		GenericSystem.CreateGenericSystem();
 		CameraFade.StartAlphaFade(Color.black,true,1,0,()=>{isFirstSetting=true;});
 	}
 	
@@ -18,7 +19,7 @@ public class Title_Manager : MonoBehaviour
 	{
 		if(!isFirstSetting||isSwitchScene){return;}
 
-		if(Input.GetKeyDown(KeyCode.Return))
+		if(Input.GetKeyDown(KeyCode.Return)||InputTouch.Instance.isTouch())
 		{
 			isSwitchScene=true;
 			CameraFade.StartAlphaFade(Color.black,false,1,0,()=>{SceneManager.LoadScene("Game");});

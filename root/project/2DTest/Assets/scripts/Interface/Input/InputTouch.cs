@@ -28,7 +28,6 @@ public class InputTouch : SingletonMonoBehaviour<InputTouch>
 
 		CanTouch=Input.touchSupported;
 
-		DontDestroyOnLoad(this);
 	}
 
 	void Update()
